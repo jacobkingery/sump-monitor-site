@@ -10,8 +10,9 @@ exports.index = function(req, res){
     if (err) throw err;
     obj = JSON.parse(data);
     var level = obj.level;
+    var timestamp = obj.timestamp;
 
-    res.render('index', { title: 'Sump Monitor', level: level });
+    res.render('index', { title: 'Sump Monitor', timestamp: timestamp, level: level });
   });
 };
 
@@ -22,7 +23,8 @@ exports.index = function(req, res){
 
 exports.update = function(req, res){
   var level = req.body.level;
-  fs.writeFile('state.json', JSON.stringify({ level: level }), function(err,data) {
+  var timestamp = req.body.timestamp;
+  fs.writeFile('state.json', JSON.stringify({ timestamp: timestamp, level: level }), function(err,data) {
     res.setHeader('Content-Type', 'application/json');
     if (err) {
       res.end(JSON.stringify({ success: false }));
