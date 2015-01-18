@@ -1,4 +1,7 @@
 extends layout
 
 block content
-  h1 #{timestamp} - Level #{level}
+  h1 #{readings[0][0]} - Level #{readings[0][1]}
+  - readings = readings.slice(1)
+  each r in readings
+    h2 #{r[0]} - Level #{r[1]}
