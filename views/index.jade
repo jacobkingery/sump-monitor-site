@@ -1,7 +1,50 @@
 extends layout
 
+block scripts
+  script.
+    var socket = io();
+    var data = !{JSON.stringify(readings)};
+
+    var svg = dimple.newSvg('#chartContainer', '100%', '100%');
+    var myChart = new dimple.chart(svg, data);
+    myChart.setMargins("50px", "10px", "25px", "75px");
+
+    var x_axis = myChart.addTimeAxis('x', 'Time', '%m/%d/%y %H:%M:%S', '%H:%M');
+    x_axis.fontSize = '14px';
+    x_axis.timePeriod = d3.time.minutes;
+    x_axis.timeInterval = 5;
+
+    var y_axis = myChart.addMeasureAxis('y', 'Level');
+    y_axis.fontSize = '14px';
+    y_axis.overrideMin = 0;
+    y_axis.overrideMax = 7;
+
+    var s = myChart.addSeries(null, dimple.plot.line);
+    s.lineMarkers = true;
+    s.getTooltipText = function(e) {
+      return [
+        'Time: ' + d3.time.format('%m/%d/%y %H:%M:%S')(e.x),
+        'Level: ' + e.y
+      ];
+    };
+
+    myChart.draw();
+
+    // Resize automagically
+    window.onresize = function() {
+      myChart.draw(0, true);
+    };
+
+    socket.on('update', function(msg) {
+      document.getElementById('latestTime').innerHTML = msg[0].Time;
+      document.getElementById('latestLevel').innerHTML = msg[0].Level;
+      myChart.data = msg;
+      myChart.draw(200);
+    });
+
 block content
-  h1 #{readings[0][0]} - Level #{readings[0][1]}
-  - readings = readings.slice(1)
-  each r in readings
-    h2 #{r[0]} - Level #{r[1]}
+  h1
+    span#latestTime #{readings[0].Time}
+    |  - Level 
+    span#latestLevel #{readings[0].Level}
+  #chartContainer
