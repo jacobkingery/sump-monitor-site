@@ -7,7 +7,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -67,6 +68,6 @@ app.post('/update', function(req, res) {
   });
 });
 
-http.listen(app.get('port'), function() {
+http.listen(app.get('port'), server_ip_address, function() {
   console.log('Express server listening on port ' + app.get('port'));
 });
