@@ -41,7 +41,6 @@ app.get('/', function(req, res) {
   getReadings(numReadings, function(err, readings) {
     if (err) throw err;
 
-    console.log(readings);
     res.render('index', {
       title: 'Sump Monitor',
       readings: readings
