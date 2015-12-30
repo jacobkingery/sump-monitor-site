@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-var fs = require('fs');
+var mongojs = require('mongojs');
 
 var app = express();
 var http = require('http').Server(app);
@@ -19,55 +19,58 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
+// connect to database
+var dbURL = process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME || 'mongodb://localhost:27017/monitor';
+var db = mongojs(dbURL, ['readings']);
+
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+// number of readings to show on the webpage
+var numReadings = 15;
+
+// helper function for getting readings from the db
+var getReadings = function(n, cb) {
+  db.readings.find().sort({$natural: -1}).limit(n, cb);
+};
+
+// GET / - render index page with readings
 app.get('/', function(req, res) {
-  fs.readFile('state.json', function(err, data) {
+  getReadings(numReadings, function(err, readings) {
     if (err) throw err;
 
-    obj = JSON.parse(data);
-    var readings = obj.readings;
-
+    console.log(readings);
     res.render('index', {
       title: 'Sump Monitor',
-      readings: readings.reverse()
+      readings: readings
     });
   });
 });
 
+// POST /update - update db and emit new readings
 app.post('/update', function(req, res) {
   var reading = {
     Time: req.body.timestamp,
     Level: req.body.level
   };
 
-  fs.readFile('state.json', function(err, data) {
-    if (err) throw err;
-    
-    // Remove oldest reading, add new reading
-    obj = JSON.parse(data);
-    var readings = obj.readings;
-    readings = readings.slice(1)
-    readings.push(reading);
+  db.readings.save(reading, function(err, saved) {
+    res.setHeader('Content-Type', 'application/json');
+    if (err) {
+      res.end(JSON.stringify({ success: false }));
+    } else {
+      res.end(JSON.stringify({ success: true }));
+    }
 
-    // Write readings to file
-    fs.writeFile('state.json', JSON.stringify({ readings: readings }), function(err,data) {
-      res.setHeader('Content-Type', 'application/json');
-      if (err) {
-        res.end(JSON.stringify({ success: false }));
-      } else {
-        res.end(JSON.stringify({ success: true }));
-      }
+    getReadings(numReadings, function(err, readings) {
+      io.emit('update', readings);
     });
-
-    // Emit updated readings array to listening sockets
-    io.emit('update', readings.reverse());
   });
 });
 
+// start server
 http.listen(app.get('port'), server_ip_address, function() {
   console.log('Express server listening on port ' + app.get('port'));
 });
