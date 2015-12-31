@@ -29,7 +29,7 @@ if ('development' == app.get('env')) {
 }
 
 // number of readings to show on the webpage
-var numReadings = 15;
+var numReadings = 30;
 
 // helper function for getting readings from the db
 var getReadings = function(n, cb) {
