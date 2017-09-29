@@ -20,10 +20,20 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // connect to database
-var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase();
-var mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'];
-var mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'];
-var dbURL = 'mongodb://' + mongoHost + ':' + mongoPort + '/monitor'
+var dbURL = process.env.DB_URL;
+if (dbURL == null) {
+  var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase();
+  var mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'];
+  var mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'];
+  var mongoDatabase = process.env[mongoServiceName + '_DATABASE'];
+  var mongoPassword = process.env[mongoServiceName + '_PASSWORD'];
+  var mongoUser = process.env[mongoServiceName + '_USER'];
+  dbURL = 'mongodb://';
+  if (mongoUser && mongoPassword) {
+    dbURL += mongoUser + ':' + mongoPassword + '@';
+  }
+  dbURL +=  mongoHost + ':' + mongoPort + '/' + mongoDatabase;
+}
 var db = mongojs(dbURL, ['readings']);
 
 // development only
