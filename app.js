@@ -7,8 +7,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // all environments
-var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
-app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 3000);
+var server_ip_address = '0.0.0.0';
+app.set('port', 8080);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -20,7 +20,10 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // connect to database
-var dbURL = process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME || 'mongodb://localhost:27017/monitor';
+var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase();
+var mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'];
+var mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'];
+var dbURL = 'mongodb://' + mongoHost + ':' + mongoPort + '/monitor'
 var db = mongojs(dbURL, ['readings']);
 
 // development only
