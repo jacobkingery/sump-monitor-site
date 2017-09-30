@@ -44,7 +44,12 @@ block scripts
 
 block content
   h1
-    span#latestTime #{readings[0].Time}
-    |  - Level 
-    span#latestLevel #{readings[0].Level}
+    if typeof(readings[0]) !== 'undefined'
+      span#latestTime #{readings[0].Time}
+      |  - Level 
+      span#latestLevel #{readings[0].Level}
+    else
+      span#latestTime No readings
+      |  - Level 
+      span#latestLevel ?
   #chartContainer
