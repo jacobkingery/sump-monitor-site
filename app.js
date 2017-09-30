@@ -36,6 +36,9 @@ if (dbURL == null) {
 }
 var db = mongojs(dbURL, ['readings']);
 
+// make sure collection is capped
+db.runCommand({'convertToCapped': 'readings', size: 20000});
+
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
