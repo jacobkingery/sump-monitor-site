@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-var mongojs = require('mongojs');
+var mongodb = require('mongodb');
 
 var app = express();
 var http = require('http').Server(app);
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // connect to database
 var dbURL = process.env.DB_URL;
-if (dbURL == null) {
+if (dbURL == null && process.env.DATABASE_SERVICE_NAME) {
   var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase();
   var mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'];
   var mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'];
@@ -34,10 +34,17 @@ if (dbURL == null) {
   }
   dbURL +=  mongoHost + ':' + mongoPort + '/' + mongoDatabase;
 }
-var db = mongojs(dbURL, ['readings']);
+var db
+mongodb.connect(dbURL, function(err, conn) {
+  if (err) throw err;
 
-// make sure collection is capped
-db.runCommand({'convertToCapped': 'readings', size: 20000});
+  db = conn
+  // make sure collection is capped
+  db.command({'convertToCapped': 'readings', size: 20000});
+
+  console.log('Connected to MongoDB');
+})
+
 
 // development only
 if ('development' == app.get('env')) {
@@ -49,7 +56,7 @@ var numReadings = 30;
 
 // helper function for getting readings from the db
 var getReadings = function(n, cb) {
-  db.readings.find().sort({$natural: -1}).limit(n, cb);
+  db.collection('readings').find().sort({$natural: -1}).limit(n).toArray(cb);
 };
 
 // GET / - render index page with readings
@@ -71,7 +78,7 @@ app.post('/update', function(req, res) {
     Level: req.body.level
   };
 
-  db.readings.save(reading, function(err, saved) {
+  db.collection('readings').insertOne(reading, function(err, saved) {
     res.setHeader('Content-Type', 'application/json');
     if (err) {
       res.end(JSON.stringify({ success: false }));
