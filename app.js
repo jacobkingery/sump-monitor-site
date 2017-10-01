@@ -71,6 +71,12 @@ app.get('/', function(req, res) {
   });
 });
 
+// GET /ping - simple ping for healthcheck
+app.get('/ping', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify({ response: 'pong' }));
+});
+
 // POST /update - update db and emit new readings
 app.post('/update', function(req, res) {
   var reading = {
