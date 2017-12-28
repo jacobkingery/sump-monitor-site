@@ -16,7 +16,7 @@
   "engines": {
     "node": "8.x"
   },
-  "repository": "github:jacobkingery/???",
+  "repository": "github:jacobkingery/sump-monitor-site",
   "license": "MIT",
   "private": true
 }
