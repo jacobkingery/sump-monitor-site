@@ -2,11 +2,15 @@ doctype html
 html
   head
     title= title
-    meta(name='viewport', content='width=device-width, initial-scale=1')
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    script(src='//d3js.org/d3.v3.min.js')
-    script(src='//dimplejs.org/dist/dimple.v2.1.6.min.js')
-    script(src='//cdn.socket.io/socket.io-1.3.7.js')
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="icon", href="https://cdn.glitch.com/935ebbec-ac43-4b66-94f4-ff01593203b1%2Ffavicon.ico?1514437804331")
+    link(rel="stylesheet", href="/stylesheets/style.css")
+    //- Note:  not using the most recent versions of dimple/d3 because of this bug:  https://github.com/PMSI-AlignAlytics/dimple/issues/265
+    //- script(src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.2/d3.min.js" integrity="sha256-cWKrfHEXPxXrbQVvgVaWBek+7V28DPDf0rFZDKs+L2Y=" crossorigin="anonymous")
+    //- script(src="https://cdnjs.cloudflare.com/ajax/libs/dimple/2.3.0/dimple.latest.min.js" integrity="sha256-PRviM8taYu4dp2uprPdLNUB+FJcD6PeA2JacrvSEXyM=" crossorigin="anonymous")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js" integrity="sha256-dsOXGNHAo/syFnazt+KTBsCQeRmlcW1XKL0bCK4Baec=" crossorigin="anonymous")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/dimple/2.2.0/dimple.latest.min.js" integrity="sha256-gbJlFMNFaZj+hp8dkgsyEPGs88d6bfqdaQwNrnN8Yjc=" crossorigin="anonymous")
+    script(src="/socket.io/socket.io.js")
   body
     block content
     block scripts
