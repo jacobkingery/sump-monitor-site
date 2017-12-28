@@ -1,3 +1,4 @@
-The OpenShift `nodejs` cartridge documentation can be found at:
+Sump Monitor Site
+=========================
 
-http://openshift.github.io/documentation/oo_cartridge_guide.html#nodejs
+This is a simple site that receives sump monitor readings, stores them in a sqlite database, and displays the most recent as a line graph using dimple.js.

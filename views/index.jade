@@ -9,7 +9,7 @@ block scripts
     var myChart = new dimple.chart(svg, data);
     myChart.setMargins("50px", "10px", "25px", "75px");
 
-    var x_axis = myChart.addTimeAxis('x', 'Time', '%m/%d/%y %H:%M:%S', '%H:%M');
+    var x_axis = myChart.addTimeAxis('x', 'Time', '%m/%d/%Y %H:%M:%S', '%H:%M');
     x_axis.fontSize = '14px';
     x_axis.timePeriod = d3.time.minutes;
     x_axis.timeInterval = 10;
@@ -23,7 +23,7 @@ block scripts
     s.lineMarkers = true;
     s.getTooltipText = function(e) {
       return [
-        'Time: ' + d3.time.format('%m/%d/%y %H:%M:%S')(e.x),
+        'Time: ' + d3.time.format('%m/%d/%Y %H:%M:%S')(e.x),
         'Level: ' + e.y
       ];
     };
@@ -36,10 +36,12 @@ block scripts
     };
 
     socket.on('update', function(msg) {
-      document.getElementById('latestTime').innerHTML = msg[0].Time;
-      document.getElementById('latestLevel').innerHTML = msg[0].Level;
-      myChart.data = msg;
-      myChart.draw(200);
+      if (typeof(msg[0]) !== 'undefined') {
+        document.getElementById('latestTime').innerHTML = msg[0].Time;
+        document.getElementById('latestLevel').innerHTML = msg[0].Level;
+        myChart.data = msg;
+        myChart.draw(200);
+      }
     });
 
 block content
